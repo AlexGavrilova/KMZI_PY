@@ -1,7 +1,7 @@
 import sys, os
 
 if len(sys.argv) != 5:
-    print "Incorrect arguments! Enter <input_file.txt> <output_file.txt> <1> (or <2>) <key>."
+    print "Invalid arguments! Enter <input_file.txt> <output_file.txt> <1> (or <2>) <key>."
     sys.exit(0)
 
 if not os.path.isfile(sys.argv[1]):
@@ -19,7 +19,7 @@ if (sys.argv[3] != '1') and (sys.argv[3] != '2'):
 
 key = int(sys.argv[4])
 if(key < 1 or key > 255):
-    print "Error! Incorrect key."
+    print "Error! Invalid key."
     sys.exit(0)
 
 while len(ch) != 0:
