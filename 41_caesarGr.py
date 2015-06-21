@@ -17,7 +17,7 @@ def caesar(InputFile,OutputFile, Key, EnDec):
 
     key = int(Key);
     if(key < 1 or key > 255):
-        tkMessageBox.showerror("Error!","Incorrect key.")
+        tkMessageBox.showerror("Error!","Invalid key.")
         sys.exit(0)
 
     while len(ch) != 0:
