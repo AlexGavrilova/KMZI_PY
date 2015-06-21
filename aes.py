@@ -298,30 +298,26 @@ def readFile(file, ifBinary):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print 'Error: too few arguments. <input_data_file> <key_file> (-e | -d).'
+        print 'Error! Invalid arguments! Enter: <input.txt> <key.txt> <1> (or <2>).'
         sys.exit
     else:
         inputFile = open(sys.argv[1], 'rb')
         inputData = readFile(inputFile, True)
 
-        if  len(inputData) == 0:
-            print 'Error: empty <input_data_file>/'
-            sys.exit
-
         keyFile = open(sys.argv[2], 'r')
         key = readFile(keyFile, False)
 
         if len(key) == 0 or len(key) > 16:
-            print 'Error: invalid <key_file> size. Key length should be above 0 and less or equal 16.'
+            print 'Error! Invalid key size(0<key<17).'
             sys.exit
 
         encryptOrNot = True
         action = sys.argv[3]
-        if action == '-e' or action == '-d':
-            if action == '-d':
+        if action == '1' or action == '2':
+            if action == '2':
                 encryptOrNot = False
         else:
-            print 'Error: invalid action. Encryption (-e) or decryption (-d) only.'
+            print 'Error! Enter <1> - encryption or <2> - decryption.'
             sys.exit
 
         arrayOf16ByteBlocks = []
@@ -357,9 +353,9 @@ if __name__ == "__main__":
         outputFileName = currentPath + '//' + sys.argv[1]
 
         if encryptOrNot:
-            outputFileName += '_AES_encrypted'
+            outputFileName += '_1.txt'
         else:
-            outputFileName += '_AES_decrypted'
+            outputFileName += '_2.txt'
 
         outputFile = open(outputFileName, 'wb')
 
