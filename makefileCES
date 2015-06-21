@@ -1,2 +1,0 @@
-all:
-	g++ -w -o caesar caesar.py -lm
