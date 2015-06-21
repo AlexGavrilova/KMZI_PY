@@ -1,7 +1,7 @@
 import sys, os
 
 if len(sys.argv) != 5:
-    print "Incorrect arguments! Enter <input_file.txt> <output_file.txt> <1> (or <2>) <key>."
+    print "Invalid arguments! Enter <input_file.txt> <output_file.txt> <1> (or <2>) <key>."
     sys.exit(0)
 
 if not os.path.isfile(sys.argv[1]) :
