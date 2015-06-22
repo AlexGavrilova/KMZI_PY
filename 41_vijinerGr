@@ -3,15 +3,11 @@
 
 import sys, os
 import Tkinter as tk
+import tkFileDialog
 import tkMessageBox
 
 def caesar(InputFile,OutputFile, Key, EnDec):
-    if not os.path.isfile(InputFile):
-        tkMessageBox.showerror("Error!","File isn't found.")
-        sys.exit(0)
-
-    inputFile = open(InputFile,'r')
-    ch = inputFile.read(1)
+    ch = InputFile.read(1)
 
     outputFile = open(OutputFile, 'w')
 
@@ -28,11 +24,11 @@ def caesar(InputFile,OutputFile, Key, EnDec):
             if (EnDec == '1'):
                 brr = (ord(ch) + key[i]) % 256
             outputFile.write(chr(brr))
-            ch = inputFile.read(1)
+            ch = InputFile.read(1)
             if i == len(key):
                 i = 0
 
-    inputFile.close()
+    InputFile.close()
     outputFile.close()
     return True
 
@@ -41,17 +37,13 @@ class SampleApp(tk.Tk):
         tk.Tk.__init__(self)
 	self.title('Vijiner chiper')
 	self.geometry('300x200')
-	self.InFile = tk.Label(self, text = "Input file: ")
 	self.OutFile = tk.Label(self, text = "Output file: ")
         self.Key = tk.Label(self, text = "Key: ")
-        self.entryInFile = tk.Entry(self)
         self.entryOutFile = tk.Entry(self)
         self.entryKey = tk.Entry(self)
         self.buttonEncrypt = tk.Button(self, text="Encrypt", command=self.on_button_encrypt)
         self.buttonDecrypt = tk.Button(self, text="Decrypt", command=self.on_button_decrypt)
 
-        self.InFile.place(x = 10, y = 10)
-        self.entryInFile.place(x = 100, y = 10)
 	self.OutFile.place(x = 10, y = 50)
         self.entryOutFile.place(x = 100, y = 50)
         self.Key.place(x = 10, y = 100)
@@ -60,28 +52,24 @@ class SampleApp(tk.Tk):
         self.buttonDecrypt.place(x = 120, y = 150)
 
     def on_button_encrypt(self):
+        InputFile = tkFileDialog.askopenfile()
         Key = self.entryKey.get()
         if len(Key) == 0:
             sys.exit(0)
         OutputFile = self.entryOutFile.get()
 	if len(OutputFile) == 0:
-            sys.exit(0)
-        InputFile = self.entryInFile.get()
-	if len(InputFile) == 0:
             sys.exit(0)
         EnDec = '1'
         start = caesar(InputFile,OutputFile, Key, EnDec)
         tkMessageBox.showinfo("Success!","File is encrypted.")
 
     def on_button_decrypt(self):
+        InputFile = tkFileDialog.askopenfile()
         Key = self.entryKey.get()
         if len(Key) == 0:
             sys.exit(0)
         OutputFile = self.entryOutFile.get()
 	if len(OutputFile) == 0:
-            sys.exit(0)
-        InputFile = self.entryInFile.get()
-	if len(InputFile) == 0:
             sys.exit(0)
         EnDec = '2'
         start = caesar(InputFile,OutputFile, Key, EnDec)
@@ -89,5 +77,3 @@ class SampleApp(tk.Tk):
 
 app = SampleApp()
 app.mainloop()
-
-
