@@ -1,11 +1,9 @@
 import sys
 import os
 
-nb = 4  
-nr = 10  
-nk = 4  
-
-hex_to_int = {'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15}
+nb = 4  #stolb 32x
+nr = 10 #rounds 
+nk = 4  #32x words for key
 
 Sbox = [
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
