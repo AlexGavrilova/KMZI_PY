@@ -366,6 +366,7 @@ class SampleApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 	self.title('aes')
+	self.geometry('300x200')
 	self.textNameFile = tk.Label(self, text = "Input file: ")
 	self.textKeyFile = tk.Label(self, text = "Key file: ")
         self.entryNameFile = tk.Entry(self)
