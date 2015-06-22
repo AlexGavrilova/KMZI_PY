@@ -36,6 +36,7 @@ class SampleApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 	self.title('Caesar chiper')
+	self.geometry('300x200')
 	self.InFile = tk.Label(self, text = "Input file: ")
 	self.OutFile = tk.Label(self, text = "Output file: ")
         self.Key = tk.Label(self, text = "Key(1,2,3...): ")
