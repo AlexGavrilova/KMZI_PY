@@ -1,9 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 import os, sys
 import Tkinter as tk
 import tkMessageBox
+import tkFileDialog
 
 nb = 4  
 nr = 10  
@@ -298,15 +296,10 @@ def readFile(file, ifBinary):
     return data
 
 def workFile(keyFile,nameFile,EnDec):
-    print keyFile
-    print nameFile
-    print EnDec
-    inputFile = open(nameFile, 'rb')
-    inputData = readFile(inputFile, True)
+    inputData = readFile(nameFile, True)
     if  len(inputData) == 0:
         sys.exit
-    keyInFile = open(keyFile, 'r')
-    key = readFile(keyInFile, False)
+    key = readFile(keyFile, False)
     if len(key) == 0 or len(key) > 16:
         sys.exit
     encryptOrNot = True
@@ -347,7 +340,7 @@ def workFile(keyFile,nameFile,EnDec):
             outputData.pop();
 
     currentPath = os.path.dirname(os.path.abspath(__file__))
-    outputFileName = currentPath + '//' + nameFile
+    outputFileName = currentPath + '//' + "output"
 
     if encryptOrNot:
         outputFileName += '_1.txt'
@@ -362,42 +355,48 @@ def workFile(keyFile,nameFile,EnDec):
     outputFile.close()
     return True
 
+def ChooseFile():
+    nameFile = tkFileDialog.askopenfile()
+    return nameFile
+
 class SampleApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 	self.title('aes')
-	self.geometry('300x200')
-	self.textNameFile = tk.Label(self, text = "Input file: ")
-	self.textKeyFile = tk.Label(self, text = "Key file: ")
-        self.entryNameFile = tk.Entry(self)
-        self.entryKeyFile = tk.Entry(self)
-        self.buttonEncrypt = tk.Button(self, text="Encrypt", command=self.on_button_encrypt)
-        self.buttonDecrypt = tk.Button(self, text="Decrypt", command=self.on_button_decrypt)
+	self.geometry('200x100')
+	self.Intro = tk.Label(self, text = "What do you want to do? ;) ")
+        self.buttonEncrypt = tk.Button(self, text="Encrypt file", command=self.on_button_encrypt)
+        self.buttonDecrypt = tk.Button(self, text="Decrypt file", command=self.on_button_decrypt)
 
-	self.textNameFile.place(x = 10, y = 10)
-        self.entryNameFile.place(x = 100, y = 10)
-	self.textKeyFile.place(x = 10, y = 50)
-        self.entryKeyFile.place(x = 100, y = 50)
-        self.buttonEncrypt.place(x = 10, y = 100)
-        self.buttonDecrypt.place(x = 100, y = 100)
+        self.Intro.place(x = 20, y = 10)
+        self.buttonEncrypt.place(x = 20, y = 40)
+        self.buttonDecrypt.place(x = 110, y = 40)
 
     def on_button_encrypt(self):
-        keyFile = self.entryKeyFile.get()
-	if len(keyFile) == 0:
+        tkMessageBox.showinfo("You're cool!","Choose input file.")
+        nameFile = ChooseFile()
+        if nameFile == None:
+            tkMessageBox.showerror("Error!","File isn't chosen.")
             sys.exit()
-        nameFile = self.entryNameFile.get()
-	if len(nameFile) == 0:
+        tkMessageBox.showinfo("You're cool!","Choose key file.")
+        keyFile = ChooseFile()
+        if keyFile == None:
+            tkMessageBox.showerror("Error!","File isn't chosen.")
             sys.exit()
         EnDec = '1'
         final = workFile(keyFile,nameFile, EnDec)
         tkMessageBox.showinfo("Success!","File is encrypted.")
 
     def on_button_decrypt(self):
-        keyFile = self.entryKeyFile.get()
-	if len(keyFile) == 0:
+        tkMessageBox.showinfo("You're cool!","Choose input file.")
+        nameFile = ChooseFile()
+        if nameFile == None:
+            tkMessageBox.showerror("Error!","File isn't chosen.")
             sys.exit()
-        nameFile = self.entryNameFile.get()
-	if len(nameFile) == 0:
+        tkMessageBox.showinfo("You're cool!","Choose key file.")
+        keyFile = ChooseFile()
+        if keyFile == None:
+            tkMessageBox.showerror("Error!","File isn't chosen.")
             sys.exit()
 	EnDec = '2'
         final = workFile(keyFile,nameFile, EnDec)
