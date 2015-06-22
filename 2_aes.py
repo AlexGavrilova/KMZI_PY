@@ -5,9 +5,9 @@ nb = 4
 nr = 10  
 nk = 4  
 
-hex_symbols_to_int = {'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15}
+hex_to_int = {'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15}
 
-sbox = [
+Sbox = [
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
     0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
     0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
@@ -26,7 +26,7 @@ sbox = [
     0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
 ]
 
-inv_sbox = [
+InvSbox = [
     0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
     0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
     0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
@@ -45,7 +45,7 @@ inv_sbox = [
     0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
 ]
 
-rcon = [[0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36],
+Rcon = [[0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36],
         [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
         [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
         [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
@@ -59,21 +59,21 @@ def encrypt(input_bytes, key):
         for c in range(nb):
             state[r].append(input_bytes[r + 4 * c])
 
-    key_schedule = key_expansion(key)
+    KeyEndec = KeyExpansion(key)
 
-    state = add_round_key(state, key_schedule)
+    state = AddRoundKey(state, KeyEndec)
 
     for rnd in range(1, nr):
-        state = sub_bytes(state)    
-        state = shift_rows(state)
-        state = mix_columns(state)
-        state = add_round_key(state, key_schedule, rnd)
+        state = SubBytes(state)    
+        state = ShiftRows(state)
+        state = MixColumns(state)
+        state = AddRoundKey(state, KeyEndec, rnd)
 
-    state = sub_bytes(state)
+    state = SubBytes(state)
     
-    state = shift_rows(state)
+    state = ShiftRows(state)
     
-    state = add_round_key(state, key_schedule, rnd + 1)
+    state = AddRoundKey(state, KeyEndec, rnd + 1)
     
     output = [None for i in range(4 * nb)]
     for r in range(4):
@@ -90,23 +90,23 @@ def decrypt(cipher, key):
         for c in range(nb):
             state[r].append(cipher[r + 4 * c])
 
-    key_schedule = key_expansion(key)
+    KeyEndec = KeyExpansion(key)
 
-    state = add_round_key(state, key_schedule, nr)
+    state = AddRoundKey(state, KeyEndec, nr)
 
     rnd = nr - 1
     while rnd >= 1:
-        state = shift_rows(state, inv=True)
-        state = sub_bytes(state, inv=True)
-        state = add_round_key(state, key_schedule, rnd)
-        state = mix_columns(state, inv=True)
+        state = ShiftRows(state, inv=True)
+        state = SubBytes(state, inv=True)
+        state = AddRoundKey(state, KeyEndec, rnd)
+        state = MixColumns(state, inv=True)
 
         rnd -= 1
         
 
-    state = shift_rows(state, inv=True)
-    state = sub_bytes(state, inv=True)
-    state = add_round_key(state, key_schedule, rnd)
+    state = ShiftRows(state, inv=True)
+    state = SubBytes(state, inv=True)
+    state = AddRoundKey(state, KeyEndec, rnd)
 
     output = [None for i in range(4 * nb)]
     for r in range(4):
@@ -116,54 +116,54 @@ def decrypt(cipher, key):
     return output
 
 
-def sub_bytes(state, inv=False):
+def SubBytes(state, inv=False):
 
     if inv == False:  
-        box = sbox
+        box = Sbox
     else:  
-        box = inv_sbox
+        box = InvSbox
 
     for i in range(len(state)):
         for j in range(len(state[i])):
             row = state[i][j] // 0x10
             col = state[i][j] % 0x10
 
-            box_elem = box[16 * row + col]
-            state[i][j] = box_elem
+            BoxElem = box[16 * row + col]
+            state[i][j] = BoxElem
 
     return state
 
 
-def shift_rows(state, inv=False):
+def ShiftRows(state, inv=False):
 
     count = 1
 
     if inv == False:  
         for i in range(1, nb):
-            state[i] = left_shift(state[i], count)
+            state[i] = LeftShift(state[i], count)
             count += 1
     else:  
         for i in range(1, nb):
-            state[i] = right_shift(state[i], count)
+            state[i] = RightShift(state[i], count)
             count += 1
 
     return state
 
 
-def mix_columns(state, inv=False):
+def MixColumns(state, inv=False):
 
     for i in range(nb):
         if inv == False:  
-            s0 = mul_by_02(state[0][i]) ^ mul_by_03(state[1][i]) ^ state[2][i] ^ state[3][i]            
-            s1 = state[0][i] ^ mul_by_02(state[1][i]) ^ mul_by_03(state[2][i]) ^ state[3][i]
-            s2 = state[0][i] ^ state[1][i] ^ mul_by_02(state[2][i]) ^ mul_by_03(state[3][i])
-            s3 = mul_by_03(state[0][i]) ^ state[1][i] ^ state[2][i] ^ mul_by_02(state[3][i])
+            s0 = Mul02(state[0][i]) ^ Mul03(state[1][i]) ^ state[2][i] ^ state[3][i]            
+            s1 = state[0][i] ^ Mul02(state[1][i]) ^ Mul03(state[2][i]) ^ state[3][i]
+            s2 = state[0][i] ^ state[1][i] ^ Mul02(state[2][i]) ^ Mul03(state[3][i])
+            s3 = Mul03(state[0][i]) ^ state[1][i] ^ state[2][i] ^ Mul02(state[3][i])
             
         else:  
-            s0 = mul_by_0e(state[0][i]) ^ mul_by_0b(state[1][i]) ^ mul_by_0d(state[2][i]) ^ mul_by_09(state[3][i])
-            s1 = mul_by_09(state[0][i]) ^ mul_by_0e(state[1][i]) ^ mul_by_0b(state[2][i]) ^ mul_by_0d(state[3][i])
-            s2 = mul_by_0d(state[0][i]) ^ mul_by_09(state[1][i]) ^ mul_by_0e(state[2][i]) ^ mul_by_0b(state[3][i])
-            s3 = mul_by_0b(state[0][i]) ^ mul_by_0d(state[1][i]) ^ mul_by_09(state[2][i]) ^ mul_by_0e(state[3][i])
+            s0 = Mul0e(state[0][i]) ^ Mul0b(state[1][i]) ^ Mul0d(state[2][i]) ^ Mul09(state[3][i])
+            s1 = Mul09(state[0][i]) ^ Mul0e(state[1][i]) ^ Mul0b(state[2][i]) ^ Mul0d(state[3][i])
+            s2 = Mul0d(state[0][i]) ^ Mul09(state[1][i]) ^ Mul0e(state[2][i]) ^ Mul0b(state[3][i])
+            s3 = Mul0b(state[0][i]) ^ Mul0d(state[1][i]) ^ Mul09(state[2][i]) ^ Mul0e(state[3][i])
 
         state[0][i] = s0
         state[1][i] = s1
@@ -173,49 +173,49 @@ def mix_columns(state, inv=False):
     return state
 
 
-def key_expansion(key):
+def KeyExpansion(key):
 
-    key_symbols = [ord(symbol) for symbol in key]
+    KeySymbols = [ord(symbol) for symbol in key]
 
-    if len(key_symbols) < 4 * nk:
-        for i in range(4 * nk - len(key_symbols)):
-            key_symbols.append(0x01)
+    if len(KeySymbols) < 4 * nk:
+        for i in range(4 * nk - len(KeySymbols)):
+            KeySymbols.append(0x01)
 
-    key_schedule = [[] for i in range(4)]
+    KeyEndec = [[] for i in range(4)]
     for r in range(4):
         for c in range(nk):
-            key_schedule[r].append(key_symbols[r + 4 * c])
+            KeyEndec[r].append(KeySymbols[r + 4 * c])
 
     for col in range(nk, nb * (nr + 1)):
         if col % nk == 0:
-            tmp = [key_schedule[row][col - 1] for row in range(1, 4)]
-            tmp.append(key_schedule[0][col - 1])
+            tmp = [KeyEndec[row][col - 1] for row in range(1, 4)]
+            tmp.append(KeyEndec[0][col - 1])
 
             for j in range(len(tmp)):
-                sbox_row = tmp[j] // 0x10
-                sbox_col = tmp[j] % 0x10
-                sbox_elem = sbox[16 * sbox_row + sbox_col]
-                tmp[j] = sbox_elem
+                SboxRow = tmp[j] // 0x10
+                SboxCol = tmp[j] % 0x10
+                SboxElem = Sbox[16 * SboxRow + SboxCol]
+                tmp[j] = SboxElem
 
             for row in range(4):
-                s = (key_schedule[row][col - 4]) ^ (tmp[row]) ^ (rcon[row][int(col / nk - 1)])
-                key_schedule[row].append(s)
+                s = (KeyEndec[row][col - 4]) ^ (tmp[row]) ^ (Rcon[row][int(col / nk - 1)])
+                KeyEndec[row].append(s)
 
         else:
             for row in range(4):
-                s = key_schedule[row][col - 4] ^ key_schedule[row][col - 1]
-                key_schedule[row].append(s)
+                s = KeyEndec[row][col - 4] ^ KeyEndec[row][col - 1]
+                KeyEndec[row].append(s)
 
-    return key_schedule
+    return KeyEndec
 
 
-def add_round_key(state, key_schedule, round=0):
+def AddRoundKey(state, KeyEndec, round=0):
 
     for col in range(nk):
-        s0 = state[0][col] ^ key_schedule[0][nb * round + col]
-        s1 = state[1][col] ^ key_schedule[1][nb * round + col]
-        s2 = state[2][col] ^ key_schedule[2][nb * round + col]
-        s3 = state[3][col] ^ key_schedule[3][nb * round + col]
+        s0 = state[0][col] ^ KeyEndec[0][nb * round + col]
+        s1 = state[1][col] ^ KeyEndec[1][nb * round + col]
+        s2 = state[2][col] ^ KeyEndec[2][nb * round + col]
+        s3 = state[3][col] ^ KeyEndec[3][nb * round + col]
 
         state[0][col] = s0
         state[1][col] = s1
@@ -224,7 +224,7 @@ def add_round_key(state, key_schedule, round=0):
 
     return state
 
-def left_shift(array, count):
+def LeftShift(array, count):
 
     res = array[:]
     for i in range(count):
@@ -235,7 +235,7 @@ def left_shift(array, count):
     return res
 
 
-def right_shift(array, count):
+def RightShift(array, count):
 
     res = array[:]
     for i in range(count):
@@ -246,7 +246,7 @@ def right_shift(array, count):
     return res
 
 
-def mul_by_02(num):
+def Mul02(num):
 
     if num < 0x80:
         res = (num << 1)
@@ -256,29 +256,29 @@ def mul_by_02(num):
     return res % 0x100
 
 
-def mul_by_03(num):
+def Mul03(num):
 
-    return (mul_by_02(num) ^ num)
-
-
-def mul_by_09(num):
-
-    return mul_by_02(mul_by_02(mul_by_02(num))) ^ num
+    return (Mul02(num) ^ num)
 
 
-def mul_by_0b(num):
+def Mul09(num):
 
-    return mul_by_02(mul_by_02(mul_by_02(num))) ^ mul_by_02(num) ^ num
-
-
-def mul_by_0d(num):
-
-    return mul_by_02(mul_by_02(mul_by_02(num))) ^ mul_by_02(mul_by_02(num)) ^ num
+    return Mul02(Mul02(Mul02(num))) ^ num
 
 
-def mul_by_0e(num):
+def Mul0b(num):
 
-    return mul_by_02(mul_by_02(mul_by_02(num))) ^ mul_by_02(mul_by_02(num)) ^ mul_by_02(num)
+    return Mul02(Mul02(Mul02(num))) ^ Mul02(num) ^ num
+
+
+def Mul0d(num):
+
+    return Mul02(Mul02(Mul02(num))) ^ Mul02(Mul02(num)) ^ num
+
+
+def Mul0e(num):
+
+    return Mul02(Mul02(Mul02(num))) ^ Mul02(Mul02(num)) ^ Mul02(num)
 
 
 def readFile(file, ifBinary):
